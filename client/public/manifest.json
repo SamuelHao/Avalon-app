@@ -1,0 +1,8 @@
+{
+  "short_name": "Avalon App",
+  "name": "Avalon React Web App",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
