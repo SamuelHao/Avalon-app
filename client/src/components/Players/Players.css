@@ -10,7 +10,14 @@
 .activeContainer {
   display: flex;
   align-items: center;
-  margin-bottom: 50%;
+  margin-bottom: 10%;
+}
+
+.curKing {
+  color: gold;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10%;
 }
 
 .activeItem {

@@ -4,15 +4,20 @@ import onlineIcon from "../../icons/onlineIcon.png";
 
 import "./Players.css";
 
-const Players = ({ players }) => (
+const Players = ({ players, gameState }) => (
   <div className="textContainer">
     {players ? (
       <div>
         <h1>Players:</h1>
         <div className="activeContainer">
           <h2>
-            {players.map(({ name }) => (
-              <div key={name} className="activeItem">
+            {players.map(({ name, id }) => (
+              <div
+                key={name}
+                className={
+                  id === gameState.currentKingID ? "curKing" : "activeContainer"
+                }
+              >
                 {name}
                 <img alt="Online Icon" src={onlineIcon} />
               </div>

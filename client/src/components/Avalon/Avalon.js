@@ -81,7 +81,7 @@ const Avalon = ({ location }) => {
           sendMessage={sendMessage}
         />
       </div>
-      <Players players={players} />
+      <Players players={players} gameState={gameState} />
       <GameState gameStart={gameStart} />
     </div>
   );

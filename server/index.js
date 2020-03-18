@@ -12,7 +12,12 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// Most of this code is completely resuable for any room based web applications
+// The avalon specific sections are labelled as such
+
 io.on("connection", socket => {
+  // On join, sends a message, adds user to the users array,
+  // emits current users in room (roomData)
   socket.on("join", ({ name, room }, callback) => {
     console.log(`User ${name} has joined room ${room}`);
 
@@ -44,21 +49,29 @@ io.on("connection", socket => {
     callback();
   });
 
-  // AVALON STUFF
+  //BEGIN AVALON
   socket.on("gameStart", () => {
+    // On gameStart, initializes and emits gameState
     console.log("gameStart received");
     const user = getUser(socket.id);
     const room = user.room;
+    const users = getUsersInRoom(room);
+    const randomKing = users[Math.floor(Math.random() * users.length)];
     const gameState = {
-      room,
-      currentMission: 0,
-      currentVoteRound: 0,
-      pastMissions: ["Pass", "Fail"]
+      room, //Room code
+      players: users.length,
+      currentMission: 0, // Mission 0 to 4
+      currentVoteRound: 0, //Voting round 0 to 4
+      pastMissions: [], //Array of past mission objects;, success:, fail:
+      currentKingID: randomKing.id
     };
     io.to(room).emit("gameStateUpdate", gameState);
   });
-  // END AVALON STUFF
+  // END AVALON
 
+  // On disconnect, removes user from current users array,
+  // sends a message notifying other users of the disconnect
+  // emits current users in the room (roomData)
   socket.on("disconnect", () => {
     const user = removeUser(socket.id);
     if (user) {
