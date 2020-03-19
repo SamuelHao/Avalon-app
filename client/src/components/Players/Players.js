@@ -20,6 +20,12 @@ const Players = ({ players, gameState }) => (
               >
                 {name}
                 <img alt="Online Icon" src={onlineIcon} />
+                <div>
+                  {gameState.voted &&
+                  gameState.voted.filter(player => player.name === name).length
+                    ? "Ready"
+                    : ""}
+                </div>
               </div>
             ))}
           </h2>

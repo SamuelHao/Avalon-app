@@ -8,6 +8,7 @@ import Input from "../Input/Input";
 import Messages from "../Messages/Messages";
 import Players from "../Players/Players";
 import GameState from "../GameState/GameState";
+import Voting from "../Voting/Voting";
 
 let socket;
 
@@ -67,7 +68,11 @@ const Avalon = ({ location }) => {
   };
 
   const gameStart = () => {
-    socket.emit("gameStart", gameState);
+    socket.emit("gameStart");
+  };
+
+  const vote = result => {
+    socket.emit("voted", name, result, gameState);
   };
 
   return (
@@ -81,6 +86,7 @@ const Avalon = ({ location }) => {
           sendMessage={sendMessage}
         />
       </div>
+      <Voting gameState={gameState} vote={vote} />
       <Players players={players} gameState={gameState} />
       <GameState gameStart={gameStart} />
     </div>

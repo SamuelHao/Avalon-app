@@ -59,12 +59,31 @@ io.on("connection", socket => {
     const randomKing = users[Math.floor(Math.random() * users.length)];
     const gameState = {
       room, //Room code
-      players: users.length,
+      players: users.length, //number of players
       currentMission: 0, // Mission 0 to 4
       currentVoteRound: 0, //Voting round 0 to 4
+      voted: [], //Array of vote objects (name and vote status (pass/fail, approve/reject))
       pastMissions: [], //Array of past mission objects;, success:, fail:
+
+      playersPerMission: [2, 3, 3, 4, 4],
       currentKingID: randomKing.id
     };
+    io.to(room).emit("gameStateUpdate", gameState);
+  });
+
+  socket.on("voted", (name, result, gameState) => {
+    const user = getUser(socket.id);
+    const room = user.room;
+    const alreadyVoted = gameState.voted.filter(player => {
+      return player.name === name;
+    });
+    if (alreadyVoted.length) {
+      //There is a player with the same name already in the voted array
+      alreadyVoted[0].result = result;
+    } else {
+      gameState.voted.push({ name, result });
+    }
+    console.log(gameState);
     io.to(room).emit("gameStateUpdate", gameState);
   });
   // END AVALON
