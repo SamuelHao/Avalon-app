@@ -55,8 +55,10 @@ io.on("connection", socket => {
     console.log("gameStart received");
     const user = getUser(socket.id);
     const room = user.room;
+
     const users = getUsersInRoom(room);
     const randomKing = users[Math.floor(Math.random() * users.length)];
+
     const gameState = {
       room, //Room code
       players: users.length, //number of players

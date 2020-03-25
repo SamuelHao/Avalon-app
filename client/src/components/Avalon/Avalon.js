@@ -86,7 +86,7 @@ const Avalon = ({ location }) => {
           sendMessage={sendMessage}
         />
       </div>
-      <Voting gameState={gameState} vote={vote} />
+      {gameState.voted && <Voting gameState={gameState} vote={vote} />}
       <Players players={players} gameState={gameState} />
       <GameState gameStart={gameStart} />
     </div>

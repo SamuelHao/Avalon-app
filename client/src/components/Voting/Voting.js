@@ -4,8 +4,10 @@ import "./Voting.css";
 
 const Voting = ({ vote, gameState }) => (
   <React.Fragment>
-    <button onClick={() => vote("approve")}>Approve</button>
-    <button onClick={() => vote("reject")}>Reject</button>
+    <div>
+      <button onClick={() => vote("approve")}>Approve</button>
+      <button onClick={() => vote("reject")}>Reject</button>
+    </div>
   </React.Fragment>
 );
 
