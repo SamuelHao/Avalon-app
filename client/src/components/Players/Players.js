@@ -1,10 +1,11 @@
 import React from "react";
+import Button from '@material-ui/core/Button';
 
-import onlineIcon from "../../icons/onlineIcon.png";
+import crown from "../../icons/crown.png";
 
 import "./Players.css";
 
-const Players = ({ players, gameState }) => (
+const Players = ({ players, gameState, isKing, addPlayerToMission, proposeMission }) => (
   <div className="textContainer">
     {players ? (
       <div>
@@ -14,12 +15,13 @@ const Players = ({ players, gameState }) => (
             {players.map(({ name, id }) => (
               <div
                 key={name}
-                className={
-                  id === gameState.currentKingID ? "curKing" : "activeContainer"
-                }
+                className={gameState.proposedPlayers && gameState.proposedPlayers.includes(name) ? "proposedPlayer" : "activeContainer"}
               >
+                <div>
+                  <Button disabled={!isKing} variant="contained" color="primary" size="small" onClick={() => addPlayerToMission(name)}>Add</Button>
+                </div>
                 {name}
-                <img alt="Online Icon" src={onlineIcon} />
+                {name === gameState.currentKing && <img alt="Crown Icon" src= {crown} /> }
                 <div>
                   {gameState.voted &&
                   gameState.voted.filter(player => player.name === name).length
@@ -28,6 +30,7 @@ const Players = ({ players, gameState }) => (
                 </div>
               </div>
             ))}
+            <Button disabled={!isKing} variant="contained" color="primary" size="small" onClick={proposeMission}>Propose Mission</Button>
           </h2>
         </div>
       </div>

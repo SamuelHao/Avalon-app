@@ -75,6 +75,14 @@ const Avalon = ({ location }) => {
     socket.emit("voted", name, result, gameState);
   };
 
+  const addPlayerToMission = name => {
+    socket.emit("addPlayerToMission", name, gameState);
+  };
+
+  const proposeMission = () => {
+    socket.emit("proposeMission", gameState);
+  }
+
   return (
     <div className="outerContainer">
       <div className="container">
@@ -86,9 +94,9 @@ const Avalon = ({ location }) => {
           sendMessage={sendMessage}
         />
       </div>
-      {gameState.voted && <Voting gameState={gameState} vote={vote} />}
-      <Players players={players} gameState={gameState} />
-      <GameState gameStart={gameStart} />
+      {(gameState.proposingMission || (gameState.activeMission && gameState.proposedPlayers.include(name))) && <Voting gameState={gameState} vote={vote} />}
+      <Players players={players} gameState={gameState} isKing={name === gameState.currentKing} addPlayerToMission={addPlayerToMission} proposeMission={proposeMission}/>
+      <GameState gameStart={gameStart} gameState={gameState} />
     </div>
   );
 };

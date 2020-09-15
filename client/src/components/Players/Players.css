@@ -13,8 +13,8 @@
   margin-bottom: 10%;
 }
 
-.curKing {
-  color: gold;
+.proposedPlayer {
+  color: green;
   display: flex;
   align-items: center;
   margin-bottom: 10%;

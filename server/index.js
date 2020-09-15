@@ -61,14 +61,16 @@ io.on("connection", socket => {
 
     const gameState = {
       room, //Room code
-      players: users.length, //number of players
+      players: users.length, // Number of players
       currentMission: 0, // Mission 0 to 4
-      currentVoteRound: 0, //Voting round 0 to 4
-      voted: [], //Array of vote objects (name and vote status (pass/fail, approve/reject))
-      pastMissions: [], //Array of past mission objects;, success:, fail:
-
-      playersPerMission: [2, 3, 3, 4, 4],
-      currentKingID: randomKing.id
+      proposingMission: false, // Whether or not a mission has been proposed by the king and sent to votin
+      activeMission: false, // Whether or not a mission is currently happening and players are sending approvals and rejects
+      currentVoteRound: 0, // Voting round 0 to 4
+      voted: [], // Array of vote objects (name and vote status (pass/fail, approve/reject))
+      pastMissions: [], // Array of past mission objects;, success:, fail:
+      proposedPlayers: [], // Currently Proposed Mission Players
+      playersPerMission: [2, 3, 2, 3, 3],
+      currentKing: randomKing.name
     };
     io.to(room).emit("gameStateUpdate", gameState);
   });
@@ -80,16 +82,46 @@ io.on("connection", socket => {
       return player.name === name;
     });
     if (alreadyVoted.length) {
-      //There is a player with the same name already in the voted array
+      // This player has already voted
       alreadyVoted[0].result = result;
     } else {
       gameState.voted.push({ name, result });
     }
+
+    // If everyone has voted, the mission goes through or the next person becomes the King
     console.log(gameState);
     io.to(room).emit("gameStateUpdate", gameState);
   });
-  // END AVALON
 
+  socket.on("addPlayerToMission", (name, gameState) => {
+    const user = getUser(socket.id);
+    const room = user.room;
+
+    // If the proposed player is already proposed, then remove them
+    // Then add them to the array
+    if (gameState.proposedPlayers.includes(name)) {
+      const index = gameState.proposedPlayers.indexOf(name);
+      gameState.proposedPlayers.splice(index, 1);
+    
+      // Otherwise, if the max num of proposed players has not been reached, add them
+    } else if (gameState.proposedPlayers.length != gameState.playersPerMission[gameState.currentMission]) {
+      gameState.proposedPlayers.push(name);
+    }
+    
+    console.log(gameState);
+    io.to(room).emit("gameStateUpdate", gameState);
+  })
+
+  socket.on("proposeMission", (gameState) => {
+    const user = getUser(socket.id);
+    const room = user.room;
+    
+    if (gameState.proposedPlayers.length === gameState.playersPerMission[gameState.currentMission]) gameState.proposingMission = true;
+    io.to(room).emit("gameStateUpdate", gameState);
+  })
+
+
+  // END AVALON
   // On disconnect, removes user from current users array,
   // sends a message notifying other users of the disconnect
   // emits current users in the room (roomData)
