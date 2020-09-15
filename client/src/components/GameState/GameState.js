@@ -4,7 +4,7 @@ import Circle from "../Circle/Circle";
 
 const GameState = ({ gameStart, gameState }) => (
   <React.Fragment>
-    <div style={{flexDirection: "row"}}>
+    <div style={{display: "flex", flexDirection: "row"}}>
       {gameState.playersPerMission && gameState.playersPerMission.map((numPlayers, index) => {
         return <Circle text={numPlayers}></Circle>
         })}
