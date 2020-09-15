@@ -95,8 +95,10 @@ const Avalon = ({ location }) => {
         />
       </div>
       {(gameState.proposingMission || (gameState.activeMission && gameState.proposedPlayers.include(name))) && <Voting gameState={gameState} vote={vote} />}
-      <Players players={players} gameState={gameState} isKing={name === gameState.currentKing} addPlayerToMission={addPlayerToMission} proposeMission={proposeMission}/>
-      <GameState gameStart={gameStart} gameState={gameState} />
+      <div>
+        <Players players={players} gameState={gameState} isKing={name === gameState.currentKing} addPlayerToMission={addPlayerToMission} proposeMission={proposeMission}/>
+        <GameState gameStart={gameStart} gameState={gameState} />
+      </div>
     </div>
   );
 };
