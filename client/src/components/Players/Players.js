@@ -18,7 +18,7 @@ const Players = ({ players, gameState, isKing, addPlayerToMission, proposeMissio
                 className={gameState.proposedPlayers && gameState.proposedPlayers.includes(name) ? "proposedPlayer" : "activeContainer"}
               >
                 <div>
-                  <Button disabled={!isKing} variant="contained" color="primary" size="small" onClick={() => addPlayerToMission(name)}>Add</Button>
+                  <Button disabled={!isKing || gameState.proposingMission || gameState.activeMission} variant="contained" color="primary" size="small" onClick={() => addPlayerToMission(name)}>Add</Button>
                 </div>
                 {name}
                 {name === gameState.currentKing && <img alt="Crown Icon" src= {crown} /> }
@@ -30,7 +30,7 @@ const Players = ({ players, gameState, isKing, addPlayerToMission, proposeMissio
                 </div>
               </div>
             ))}
-            <Button disabled={!isKing} variant="contained" color="primary" size="small" onClick={proposeMission}>Propose Mission</Button>
+            <Button disabled={!isKing || gameState.proposingMission || gameState.activeMission || gameState.proposedPlayers.length !== gameState.playersPerMission[gameState.currentMission]} variant="contained" color="primary" size="small" onClick={proposeMission}>Propose Mission</Button>
           </h2>
         </div>
       </div>

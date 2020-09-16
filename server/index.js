@@ -7,6 +7,7 @@ const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 const PORT = process.env.PORT || 5000;
 
 const router = require("./router");
+const e = require("express");
 
 const app = express();
 const server = http.createServer(app);
@@ -61,16 +62,16 @@ io.on("connection", socket => {
 
     const gameState = {
       room, //Room code
-      players: users.length, // Number of players
+      players: users, // Number of players
       currentMission: 0, // Mission 0 to 4
-      proposingMission: false, // Whether or not a mission has been proposed by the king and sent to votin
+      proposingMission: false, // Whether or not a mission has been proposed by the king and sent to voting
       activeMission: false, // Whether or not a mission is currently happening and players are sending approvals and rejects
       currentVoteRound: 0, // Voting round 0 to 4
       voted: [], // Array of vote objects (name and vote status (pass/fail, approve/reject))
       pastMissions: [], // Array of past mission objects;, success:, fail:
       proposedPlayers: [], // Currently Proposed Mission Players
-      playersPerMission: [2, 3, 2, 3, 3],
-      currentKing: randomKing.name
+      playersPerMission: [2, 3, 2, 3, 3], // Number of Players per Mission
+      currentKing: randomKing.name // Current Player King
     };
     io.to(room).emit("gameStateUpdate", gameState);
   });
@@ -89,7 +90,46 @@ io.on("connection", socket => {
     }
 
     // If everyone has voted, the mission goes through or the next person becomes the King
-    console.log(gameState);
+    const numVoted = gameState.voted.length;
+    const numPlayers = gameState.players.length;
+    const numOnMission = gameState.playersPerMission[gameState.currentMission];
+
+    // If voting on a mission proposal
+    if (numVoted === numPlayers && gameState.proposingMission) {
+      const numPassed = gameState.voted.filter(vote => vote.result === "approve").length;
+        // If the missions passes, proceed to voting stage
+        if (numPassed > numPlayers/2) {
+          gameState.activeMission = true;
+
+        // Otherwise make the next person the king and propose a new mission
+        } else {
+          const isKing = (element) => element.name === gameState.currentKing
+          const nextKing = gameState.players[(gameState.players.findIndex(isKing) + 1)%numPlayers].name;
+  
+          gameState.currentKing = nextKing;
+          gameState.proposedPlayers = [];
+        }
+        gameState.proposingMission = false;
+        gameState.voted = [];
+      
+    
+    // If voting on an active mission (success or fail)
+    } else if (numVoted === numOnMission) {
+        const numFails = gameState.voted.filter(vote => vote.result === "reject").length;
+        
+        const result = numFails > 0 ? "fail" : "success";
+        gameState.pastMissions.push({result, numFails});
+        
+        gameState.currentMission++;
+        gameState.activeMission = false;
+        gameState.proposedPlayers = [];
+        gameState.voted = [];
+
+        const isKing = (element) => element.name === gameState.currentKing
+        const nextKing = gameState.players[(gameState.players.findIndex(isKing) + 1)%numPlayers].name;
+  
+        gameState.currentKing = nextKing;
+    }
     io.to(room).emit("gameStateUpdate", gameState);
   });
 
@@ -115,7 +155,7 @@ io.on("connection", socket => {
   socket.on("proposeMission", (gameState) => {
     const user = getUser(socket.id);
     const room = user.room;
-    
+
     if (gameState.proposedPlayers.length === gameState.playersPerMission[gameState.currentMission]) gameState.proposingMission = true;
     io.to(room).emit("gameStateUpdate", gameState);
   })

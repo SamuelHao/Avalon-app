@@ -6,7 +6,13 @@ const GameState = ({ gameStart, gameState }) => (
   <div>
     <div style={{display: "flex"}}>
       {gameState.playersPerMission && gameState.playersPerMission.map((numPlayers, index) => {
-        return <Circle text={numPlayers}></Circle>
+        let colour = "blue";
+
+        if (!gameState.pastMissions[index]) colour = "lightgray";
+        else if (gameState.pastMissions[index].result === "success") colour = "green";
+        else colour = "red";
+
+        return <Circle colour={colour} key={index} text={numPlayers}></Circle>
         })}
     </div>
     <div>
